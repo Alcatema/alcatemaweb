@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Football Analyse Game</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #282c34;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #ffffff;
+        }
+
+        .main-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+        }
+
+        .ad-banner {
+            background-color: #373b41;
+            color: #ffffff;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            width: 15%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background-color: #3b4048;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            width: 60%;
+            max-width: 800px;
+            text-align: center;
+            overflow-y: auto;
+        }
+
+        h1 {
+            color: #61dafb;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            color: #ffffff;
+        }
+
+        th, td {
+            border: 1px solid #373b41;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #61dafb;
+            color: #282c34;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #21a1f1;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            width: calc(100% - 24px);
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            background-color: #4a4f57;
+            color: #ffffff;
+        }
+
+        .calendar {
+            font-size: 0.9em;
+            color: #ffffff;
+            margin-top: 20px;
+        }
+
+        .month {
+            margin-bottom: 20px;
+        }
+
+        .month h2 {
+            text-align: left;
+            color: #007bff;
+        }
+
+        .days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .days div {
+            background-color: #e0e0e0;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .days div:hover {
+            background-color: #d0d0d0;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="ad-banner">Advertisement</div>
+        <div class="container">
+            <h1>Career Football Game Analyse</h1>
+            <div>
+                <button onclick="prevMonth()">Mês Anterior</button>
+                <button onclick="nextMonth()">Próximo Mês</button>
+            </div>
+            <div id="calendar" class="calendar"></div>
+            <table style="display:none;">
+                <thead>
+                    <tr>
+                        <th>Clube</th>
+                        <th>Ano</th>
+                        <th>Jogos</th>
+                        <th>Gols</th>
+                        <th>Assistências</th>
+                    </tr>
+                </thead>
+                <tbody id="dicas-tbody">
+                </tbody>
+            </table>
+            <input type="text" id="resposta-input" placeholder="Digite sua resposta" style="display:none;">
+            <button id="submit-button" onclick="validarResposta()" style="display:none;">Enviar Resposta</button>
+            <div id="resultado"></div>
+            <div id="tentativas" style="display:none;">Tentativas: 0</div>
+        </div>
+        <div class="ad-banner">Advertisement</div>
+    </div>
+
+    <script>
+        const jogos = {
+            "2025-02-10": {
+                dicas: [["Clube", "Ano", "Jogos", "Gols", "Asistências"], ["Dica 1B", "Dica 2B", "Dica 3B", "Dica 4B"],
+                 ["Barcelona-B", "2001-2003", "54", "5", "0"],
+                 ["Barcelona", "2002-2018", "674", "57", "135"], 
+                 ["Vissel Kobe", "2018-2023", "134", "26", "25"],
+                 ["Emirates Club", "2023-2024", "23", "5", "1"],
+                 ["Spain", "2006-2018", "131", "13", "30"]
+                ],
+                resposta: "Iniesta"
+            },
+            "2025-01-02": {
+                dicas: [["Dica 1D", "Dica 2D", "Dica 3D", "Dica 4D"], ["Dica 1E", "Dica 2E", "Dica 3E", "Dica 4E"], ["Dica 1F", "Dica 2F", "Dica 3F", "Dica 4F"]],
+                resposta: "Resposta para 2025-01-02"
+            },
+            // Adicione mais jogos conforme necessário para cada dia do ano
+        };
+
+        const calendario = document.getElementById("calendar");
+        const tabela = document.querySelector("table");
+        const dicasTbody = document.getElementById("dicas-tbody");
+        const respostaInput = document.getElementById("resposta-input");
+        const resultadoDiv = document.getElementById("resultado");
+        const submitButton = document.getElementById("submit-button");
+        const tentativasDiv = document.getElementById("tentativas");
+        let dicaIndex = 0;
+        let jogoAtual = {};
+        let tentativas = 0;
+        let currentMonth = new Date(2025, 0); // Começar em janeiro de 2025
+
+        function criarCalendario() {
+            calendario.innerHTML = "";
+
+            const mesDiv = document.createElement("div");
+            mesDiv.classList.add("month");
+            const mesTitulo = document.createElement("h2");
+            mesTitulo.textContent = currentMonth.toLocaleString("default", { month: "long", year: "numeric" });
+            mesDiv.appendChild(mesTitulo);
+
+            const diasDiv = document.createElement("div");
+            diasDiv.classList.add("days");
+
+            const diasNoMes = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
+            for (let dia = 1; dia <= diasNoMes; dia++) {
+                const data = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), dia);
+                const dataFormatada = `${data.getFullYear()}-${(data.getMonth() + 1).toString().padStart(2, '0')}-${data.getDate().toString().padStart(2, '0')}`;
+                const divDia = document.createElement("div");
+                divDia.textContent = data.getDate();
+                divDia.onclick = () => iniciarJogo(dataFormatada);
+                diasDiv.appendChild(divDia);
+            }
+
+            mesDiv.appendChild(diasDiv);
+            calendario.appendChild(mesDiv);
+        }
+
+        function prevMonth() {
+            currentMonth.setMonth(currentMonth.getMonth() - 1);
+            criarCalendario();
+        }
+
+        function nextMonth() {
+            currentMonth.setMonth(currentMonth.getMonth() + 1);
+            criarCalendario();
+        }
+
+        function iniciarJogo(data) {
+            if (jogos[data]) {
+                jogoAtual = jogos[data];
+                dicaIndex = 2; // Começar com as duas primeiras linhas
+                tentativas = 0; // Iniciar a contagem de tentativas a partir de 0
+                dicasTbody.innerHTML = ""; // Limpar dicas anteriores
+                tabela.style.display = "table";
+                respostaInput.style.display = "block";
+                submitButton.style.display = "block";
+                tentativasDiv.style.display = "block";
+                resultadoDiv.textContent = "";
+                mostrarProximasDicas(1); // Mostrar as duas primeiras linhas de dicas
+                atualizarTentativas();
+            } else {
+                resultadoDiv.textContent = "Nenhum jogo disponível para esta data.";
+                resultadoDiv.style.color = "red";
+            }
+        }
+        function mostrarProximasDicas(qtd) {
+            for (let i = 0; i < qtd; i++) {
+                if (dicaIndex < jogoAtual.dicas.length) {
+                    const tr = document.createElement("tr");
+                    for (let j = 0; j < jogoAtual.dicas[dicaIndex].length; j++) {
+                        const td = document.createElement("td");
+                        td.textContent = jogoAtual.dicas[dicaIndex][j];
+                        tr.appendChild(td);
+                    }
+                    dicasTbody.appendChild(tr);
+                    dicaIndex++;
+                }
+            }
+        }
+
+        function validarResposta() {
+            const respostaInputValue = respostaInput.value.trim();
+            tentativas++;
+            atualizarTentativas();
+
+            if (respostaInputValue.toLowerCase() === jogoAtual.resposta.toLowerCase()) {
+                resultadoDiv.textContent = `Parabéns! Você acertou após ${tentativas} tentativas!`;
+                resultadoDiv.style.color = "green";
+            } else if (dicaIndex < jogoAtual.dicas.length) {
+                resultadoDiv.textContent = "Resposta incorreta. Tente novamente.";
+                resultadoDiv.style.color = "red";
+                mostrarProximasDicas(1);
+            } else {
+                resultadoDiv.textContent = "Você perdeu o jogo. Todas as dicas foram usadas.";
+                resultadoDiv.style.color = "red";
+                respostaInput.disabled = true;
+                submitButton.disabled = true;
+            }
+        }
+
+        function atualizarTentativas() {
+            tentativasDiv.textContent = `Tentativas: ${tentativas}`;
+        }
+
+        criarCalendario();
+    </script>
+</body>
+</html>

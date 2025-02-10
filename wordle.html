@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wordle Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .ad-banner {
+            width: 15%;
+            background-color: #d1d1d1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .game-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 60%;
+            text-align: center;
+            overflow-y: auto;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(var(--letters, 5), 1fr);
+            gap: 5px;
+            margin-top: 20px;
+        }
+
+        .cell {
+            background-color: #e0e0e0;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .correct {
+            background-color: green;
+            color: white;
+        }
+
+        .present {
+            background-color: yellow;
+            color: black;
+        }
+
+        .absent {
+            background-color: gray;
+            color: white;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            margin: 10px 0;
+            width: calc(100% - 24px);
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #28a745;
+            color: #fff;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .result {
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+
+        .calendar {
+            font-size: 0.9em;
+            color: #888;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-top: 20px;
+        }
+
+        .calendar div {
+            background-color: #e0e0e0;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .calendar div:hover {
+            background-color: #d0d0d0;
+        }
+
+        .guess-row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .guess-row .cell {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="ad-banner">Ad</div>
+        <div class="game-container">
+            <h1>Wordle Game</h1>
+            <div id="guesses"></div>
+            <input type="text" id="guess-input" placeholder="Enter your guess" maxlength="5">
+            <button onclick="validateGuess()">Validate Guess</button>
+            <div id="result" class="result"></div>
+            <div id="calendar" class="calendar"></div>
+            <button onclick="prevMonth()">Previous Month</button>
+            <button onclick="nextMonth()">Next Month</button>
+        </div>
+        <div class="ad-banner">Ad</div>
+    </div>
+
+    <script>
+        // Defining word lists for each day
+       
+       
+        const words = {
+            "2025-02-10": { word: "endrick", letters: 7 },
+            // Add more words for other dates as needed
+        };
+
+        let currentGame = {};
+        let currentMonth = new Date(2025, 1); // Start on February 2025
+        const guesses = [];
+        const maxTries = 7;
+
+        function validateGuess() {
+            const guessInput = document.getElementById('guess-input');
+            const guess = guessInput.value.toLowerCase();
+
+            if (guess.length !== currentGame.letters) {
+                return;
+            }
+
+            const guessInfo = [];
+            const wordMap = {};
+            for (let letter of currentGame.word) {
+                wordMap[letter] = (wordMap[letter] || 0) + 1;
+            }
+
+            for (let i = 0; i < guess.length; i++) {
+                if (guess[i] === currentGame.word[i]) {
+                    guessInfo.push({ letter: guess[i], status: 'correct' });
+                    wordMap[guess[i]]--;
+                } else if (currentGame.word.includes(guess[i]) && wordMap[guess[i]] > 0) {
+                    guessInfo.push({ letter: guess[i], status: 'present' });
+                    wordMap[guess[i]]--;
+                } else {
+                    guessInfo.push({ letter: guess[i], status: 'absent' });
+                }
+            }
+
+            guesses.push(guessInfo);
+            updateGuesses();
+
+            guessInput.value = ''; // Clear input field
+            if (guesses.length >= maxTries) {
+                guessInput.disabled = true;
+                document.querySelector('button').disabled = true;
+            }
+        }
+
+        function updateGuesses() {
+            const guessesDiv = document.getElementById('guesses');
+            guessesDiv.innerHTML = '';
+
+            // Show initial blank cells for current game length
+            for (let i = 0; i < maxTries; i++) {
+                const row = document.createElement('div');
+                row.classList.add('guess-row');
+                for (let j = 0; j < currentGame.letters; j++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    if (i < guesses.length && guesses[i][j]) {
+                        cell.textContent = guesses[i][j].letter;
+                        cell.classList.add(guesses[i][j].status);
+                    }
+                    row.appendChild(cell);
+                }
+                guessesDiv.appendChild(row);
+            }
+        }
+
+        function updateCalendar() {
+            const year = currentMonth.getFullYear();
+            const month = currentMonth.getMonth();
+            const startDate = new Date(year, month, 1);
+            const endDate = new Date(year, month + 1, 0);
+            let calendarHTML = "";
+
+            for (let i = 1; i <= endDate.getDate(); i++) {
+                const dateString = `${year}-${(month + 1).toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`;
+                calendarHTML += `<div onclick="startGame('${dateString}')">${i}/${month + 1}/${year}</div>`;
+            }
+
+            document.getElementById('calendar').innerHTML = calendarHTML;
+        }
+
+        function prevMonth() {
+            currentMonth.setMonth(currentMonth.getMonth() - 1);
+            updateCalendar();
+        }
+
+        function nextMonth() {
+            currentMonth.setMonth(currentMonth.getMonth() + 1);
+            updateCalendar();
+        }
+
+        function startGame(dateString) {
+            currentGame = words[dateString] || { word: "", letters: 0 };
+            guesses.length = 0;
+            updateGuesses();
+            document.getElementById('result').textContent = '';
+            document.getElementById('guess-input').value = '';
+            document.getElementById('guess-input').disabled = false;
+            document.querySelector('button').disabled = false;
+            document.getElementById('guess-input').setAttribute('maxlength', currentGame.letters);
+        }
+
+        // Initialize the calendar and the board on page load
+        updateCalendar();
+        startGame("2025-02-10");
+    </script>
+</body>
+</html>

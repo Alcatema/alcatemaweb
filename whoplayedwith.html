@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Who I Played With</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1419a3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .ad-banner {
+            width: 15%;
+            background-color: #f3f2f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .game-container {
+            background-color: #1419a3;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 60%;
+            text-align: center;
+            overflow-y: auto;
+        }
+
+        .hint-bar {
+            background-color: #150d6c;
+            color: #fff;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            margin: 10px 0;
+            width: calc(100% - 24px);
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #28a745;
+            color: #fff;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .result {
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+
+        .calendar {
+            font-size: 0.9em;
+            color: #888;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-top: 20px;
+        }
+
+        .calendar div {
+            background-color: #e0e0e0;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .calendar div:hover {
+            background-color: #d0d0d0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="ad-banner">Anúncio</div>
+        <div class="game-container">
+            <h1>Who I Played With</h1>
+            <div id="hint-bar" class="hint-bar"></div>
+            <input type="text" id="answer-input" placeholder="Digite sua resposta">
+            <button onclick="validateAnswer()">Validar Resposta</button>
+            <div id="result" class="result"></div>
+            <div id="calendar" class="calendar"></div>
+            <button onclick="prevMonth()">Mês Anterior</button>
+            <button onclick="nextMonth()">Próximo Mês</button>
+        </div>
+        <div class="ad-banner">Anúncio</div>
+    </div>
+
+    <script>
+        // Definindo jogos para cada dia
+        const games = {
+            "2025-02-10": [
+                { hint: "Dica 1: Joguei com David Beckham", answer: "Marcelo" },
+                { hint: "Dica 2: Joguei com Vinícius Júnior", answer: "Marcelo" },
+                { hint: "Dica 3: Joguei com Neymar", answer: "Marcelo" },
+                { hint: "Dica 4: Joguei com Hulk", answer: "Marcelo" },
+                { hint: "Dica 5: Joguei com Rodinei", answer: "Marcelo" },
+                { hint: "Dica 6: Joguei com Felipe Melo", answer: "Marcelo" },
+                { hint: "Dica 7: Joguei com Germán Cano", answer: "Marcelo" }
+        ]
+            // Adicione mais jogos conforme necessário
+        };
+
+        let currentHintIndex = 0;
+        let currentGame = [];
+        let attempts = 0;
+        let currentMonth = new Date(2025, 1); // Começa em fevereiro de 2025
+
+        function validateAnswer() {
+            const userAnswer = document.getElementById('answer-input').value.toLowerCase();
+            const resultDiv = document.getElementById('result');
+
+            if (userAnswer === currentGame[currentHintIndex].answer.toLowerCase()) {
+                resultDiv.textContent = "Você venceu! Parabéns! Você acertou uma das respostas!";
+                document.getElementById('hint-bar').textContent = "";
+                document.getElementById('answer-input').disabled = true;
+                document.querySelector('button').disabled = true;
+            } else {
+                resultDiv.textContent = "Resposta incorreta. Tente novamente.";
+                currentHintIndex++;
+                updateHints();
+                if (currentHintIndex >= currentGame.length && attempts >= maxAttempts) {
+                    resultDiv.textContent = "Você perdeu! Tente novamente.";
+                    document.getElementById('hint-bar').textContent = "";
+                    document.getElementById('answer-input').disabled = true;
+                    document.querySelector('button').disabled = true;
+                }
+            }
+
+            document.getElementById('answer-input').value = ''; // Limpar o campo de entrada
+        }
+
+        function updateHints() {
+            let hintsHTML = '';
+            for (let i = 0; i <= currentHintIndex && i < currentGame.length; i++) {
+                hintsHTML += `<p>${currentGame[i].hint}</p>`;
+            }
+            document.getElementById('hint-bar').innerHTML = hintsHTML;
+        }
+
+        function updateCalendar() {
+            const year = currentMonth.getFullYear();
+            const month = currentMonth.getMonth();
+            const startDate = new Date(year, month, 1);
+            const endDate = new Date(year, month + 1, 0);
+            let calendarHTML = "";
+
+            for (let i = 1; i <= endDate.getDate(); i++) {
+                const dateString = `${year}-${(month + 1).toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`;
+                calendarHTML += `<div onclick="startGame('${dateString}')">${i}/${month + 1}/${year}</div>`;
+            }
+
+            document.getElementById('calendar').innerHTML = calendarHTML;
+        }
+
+        function prevMonth() {
+            currentMonth.setMonth(currentMonth.getMonth() - 1);
+            updateCalendar();
+        }
+
+        function nextMonth() {
+            currentMonth.setMonth(currentMonth.getMonth() + 1);
+            updateCalendar();
+        }
+
+        function startGame(dateString) {
+            currentGame = games[dateString] || [];
+            currentHintIndex = 0;
+            attempts = 0;
+            updateHints();
+            document.getElementById('result').textContent = '';
+            document.getElementById('answer-input').value = '';
+            document.getElementById('answer-input').disabled = false;
+            document.querySelector('button').disabled = false;
+        }
+
+        // Inicializa o calendário ao carregar a página
+        updateCalendar();
+        updateHints();
+    </script>
+</body>
+</html>

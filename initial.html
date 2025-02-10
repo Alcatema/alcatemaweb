@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALCATEMA Arena</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-image: url('URL_DA_IMAGEM_DE_FUNDO');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #ffffff;
+        }
+
+        .ad-banner {
+            background-color: #373b41;
+            color: #ffffff;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            width: 15%;
+            height: 100%;
+            position: fixed;
+            top: 10%;
+        }
+
+        .ad-left {
+            left: 2%;
+        }
+
+        .ad-right {
+            right: 2%;
+        }
+
+        .main-container {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            width: 70%;
+            max-width: 1000px;
+            height: 90vh;
+            overflow-y: auto;
+            margin: auto;
+        }
+
+        h1 {
+            color: #61dafb;
+            margin-bottom: 20px;
+        }
+
+        .header-image {
+            margin-bottom: 20px;
+        }
+
+        .header-image img {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .game-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .game-item {
+            background-color: #1c1f26;
+            margin: 10px;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            width: 200px;
+            text-align: center;
+            transition: transform 0.3s, background-color 0.3s;
+        }
+
+        .game-item:hover {
+            transform: scale(1.05);
+            background-color: #272a31;
+        }
+
+        .game-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .game-title {
+            font-size: 1.2em;
+            margin-top: 10px;
+            color: #61dafb;
+        }
+
+        button {
+            padding: 12px 24px;
+            margin: 20px 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #61dafb;
+            color: #282c34;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #21a1f1;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+    <div class="ad-banner ad-left">Publicidade Esquerda</div>
+    <div class="main-container">
+        <div class="header-image">
+            <a href="LINK_DO_SITE"><img src="URL_DA_IMAGEM_DO_HEADER" alt="Imagem do Header"></a>
+        </div>
+        <h1>Arena Play</h1>
+        <div class="game-list">
+            
+            
+            <div class="game-item" onclick="window.location.href='';">
+                <img src="URL_DA_IMAGEM_DO_JOGO_1" alt="whoiplayedwith">
+                <div class="game-title">Who I Played With</div>
+            </div>
+            <div class="game-item" onclick="window.location.href='LINK_DO_JOGO_2';">
+                <img src="URL_DA_IMAGEM_DO_JOGO_2" alt="guessthecareer">
+                <div class="game-title">Guess the career</div>
+            </div>
+            <div class="game-item" onclick="window.location.href='LINK_DO_JOGO_3';">
+                <img src="URL_DA_IMAGEM_DO_JOGO_3" alt="footballwordle">
+                <div class="game-title">Football Wordle</div>
+            </div>
+            
+            <div class="game-item" onclick="window.location.href='LINK_DO_JOGO_1';">
+                <img src="URL_DA_IMAGEM_DO_JOGO_1" alt="footballquizes">
+                <div class="game-title">Football Quizes</div>
+            </div>
+            <!-- Adicione mais jogos conforme necessário -->
+        </div>
+        <div class="footer">&copy; ALCATEMA LTDA. Todos os direitos reservados.</div>
+    </div>
+    <div class="ad-banner ad-right">Publicidade Direita</div>
+</body>
+</html>
